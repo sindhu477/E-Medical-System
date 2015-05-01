@@ -23,12 +23,18 @@ public class LoginForm extends javax.swing.JFrame {
     public static User current_user;
 
     private final ActionPanel actionPanel = new ActionPanel();
+    public static PersonalInformationDialog piDialog;
+    public static AppointmentDialog apDialog;
+    public static AppointmentCreationDialog acDialog;
 
     /**
      * Creates new form LoginForm
      */
     public LoginForm() {
         initComponents();
+        piDialog = new PersonalInformationDialog(this, true);
+        apDialog = new AppointmentDialog(this, true);
+        acDialog = new AppointmentCreationDialog(this, true);
     }
 
     /**
