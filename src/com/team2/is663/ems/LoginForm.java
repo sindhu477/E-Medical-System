@@ -5,16 +5,24 @@
  */
 package com.team2.is663.ems;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.HashMap;
+import sun.misc.BASE64Encoder;
 
 /**
  *
  * @author toyknight
  */
 public class LoginForm extends javax.swing.JFrame {
+
+    public static HashMap<String, User> user_data;
+    private final BASE64Encoder encoder = new BASE64Encoder();
+    public static User current_user;
+
+    private final ActionPanel actionPanel = new ActionPanel();
 
     /**
      * Creates new form LoginForm
@@ -38,9 +46,9 @@ public class LoginForm extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         password_field = new javax.swing.JPasswordField();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        btn_login = new javax.swing.JButton();
+        btn_register = new javax.swing.JButton();
+        btn_fpassword = new javax.swing.JButton();
 
         jLabel3.setText("jLabel3");
 
@@ -55,11 +63,16 @@ public class LoginForm extends javax.swing.JFrame {
 
         jLabel4.setText("Password: ");
 
-        jButton1.setText("Login");
+        btn_login.setText("Login");
+        btn_login.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_loginActionPerformed(evt);
+            }
+        });
 
-        jButton2.setText("Register");
+        btn_register.setText("Register");
 
-        jButton3.setText("Forget Password");
+        btn_fpassword.setText("Forget Password");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -78,11 +91,11 @@ public class LoginForm extends javax.swing.JFrame {
                             .addComponent(username_field)
                             .addComponent(password_field, javax.swing.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton1)
+                        .addComponent(btn_login)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2)
+                        .addComponent(btn_register)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton3)))
+                        .addComponent(btn_fpassword)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -100,14 +113,44 @@ public class LoginForm extends javax.swing.JFrame {
                     .addComponent(password_field, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2)
-                    .addComponent(jButton3))
+                    .addComponent(btn_login)
+                    .addComponent(btn_register)
+                    .addComponent(btn_fpassword))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btn_loginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_loginActionPerformed
+        // TODO add your handling code here:
+        String username = username_field.getText();
+        String password = new String(password_field.getPassword());
+        if (validatePassword(username, password) == true) {
+            current_user = user_data.get(username);
+            actionPanel.updateButtons();
+            gotoActionPanel();
+        } else {
+            System.err.println("password error");
+        }
+    }//GEN-LAST:event_btn_loginActionPerformed
+
+    private boolean validatePassword(String username, String password) {
+        User user = user_data.get(username);
+        if (user == null) {
+            return false;
+        } else {
+            String input_password = encoder.encode(password.getBytes());
+            String correct_password = user.getPassword();
+            return input_password.trim().equals(correct_password.trim());
+        }
+    }
+
+    private void gotoActionPanel() {
+        this.setContentPane(actionPanel);
+        this.setTitle("Action Panel");
+        this.pack();
+    }
 
     /**
      * @param args the command line arguments
@@ -123,16 +166,21 @@ public class LoginForm extends javax.swing.JFrame {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
+
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(LoginForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LoginForm.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(LoginForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LoginForm.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(LoginForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LoginForm.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(LoginForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LoginForm.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
@@ -140,19 +188,21 @@ public class LoginForm extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
-                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-                    Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
+                    ObjectInputStream is = new ObjectInputStream(new FileInputStream(new File("user.dat")));
+                    user_data = (HashMap<String, User>) is.readObject();
+                    is.close();
+                    new LoginForm().setVisible(true);
+                } catch (IOException | ClassNotFoundException ex) {
+                    System.err.println(ex.getMessage());
                 }
-                new LoginForm().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
+    private javax.swing.JButton btn_fpassword;
+    private javax.swing.JButton btn_login;
+    private javax.swing.JButton btn_register;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
